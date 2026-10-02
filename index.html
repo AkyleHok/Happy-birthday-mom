@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>С днём рождения, мама</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { min-height: 100%; font-family: 'Courier New', monospace; }
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    background: radial-gradient(circle at 50% 20%, #ffd27a 0%, #ff9a3c 20%, #d94f1e 45%, #7a1f10 72%, #2a0a05 100%);
+    background-attachment: fixed;
+    position: relative;
+    transition: background 2.5s ease;
+  }
+  body.final-mode {
+    background: radial-gradient(circle at 50% 30%, #ffe6a8 0%, #ffb347 18%, #ff7a3c 40%, #7a1f10 75%, #2a0a05 100%);
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(20, 5, 2, 0.35) 0%, rgba(20, 5, 2, 0.72) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #terminal {
+    position: relative;
+    z-index: 3;
+    max-width: 720px;
+    width: 100%;
+    color: #ffe0b8;
+    text-shadow: 0 0 10px rgba(255, 154, 60, 0.9), 0 0 20px rgba(255, 154, 60, 0.5);
+    font-size: 15px;
+    line-height: 1.7;
+    letter-spacing: 1px;
+    padding-bottom: 80px;
+    transition: opacity 0.8s ease;
+  }
+
+  .line {
+    white-space: pre-wrap;
+    word-break: break-word;
+    opacity: 0;
+    transform: translateY(6px);
+    animation: fadeIn 1.2s ease-out forwards;
+  }
+  @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+  .cursor::after {
+    content: '▊';
+    animation: blink 1.1s steps(2) infinite;
+    color: #fff;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ===== ФОТО ===== */
+  .photo-wrap {
+    text-align: center;
+    margin: 26px 0;
+    opacity: 0;
+    transform: scale(0.94);
+    animation: photoIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes photoIn { to { opacity: 1; transform: scale(1); } }
+  .photo-wrap img {
+    max-width: 100%;
+    width: 320px;
+    border-radius: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.7),
+                0 0 60px rgba(255, 154, 60, 0.9),
+                0 0 100px rgba(217, 79, 30, 0.5);
+    display: inline-block;
+    animation: photoGlow 4s ease-in-out infinite;
+    transition: transform 0.6s ease;
+  }
+  @keyframes photoGlow {
+    0%, 100% { box-shadow: 0 0 25px rgba(255,255,255,0.7), 0 0 60px rgba(255,154,60,0.9), 0 0 100px rgba(217,79,30,0.5); }
+    50%      { box-shadow: 0 0 35px rgba(255,255,255,1),   0 0 80px rgba(255,154,60,1),   0 0 130px rgba(217,79,30,0.8); }
+  }
+
+  /* ===== СТИХ ===== */
+  .poem-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #fff4e0;
+    text-shadow: 0 0 12px rgba(255, 154, 60, 1), 0 0 26px rgba(217, 79, 30, 0.8);
+    opacity: 0;
+    transform: translateY(6px);
+    animation: fadeIn 1.2s ease-out forwards;
+    margin: 3px 0;
+  }
+  .poem-stanza { margin: 18px 0; }
+
+  /* ===== ASCII ===== */
+  .big-art {
+    font-size: 14px;
+    line-height: 1.15;
+    color: #ffffff;
+    text-shadow: 0 0 14px rgba(255, 154, 60, 1), 0 0 30px rgba(255, 154, 60, 0.8);
+    white-space: pre;
+    text-align: center;
+    margin: 34px 0;
+    overflow-x: auto;
+    opacity: 0;
+    animation: artIn 1.4s ease-out forwards, pulse 3s ease-in-out infinite 1.4s;
+  }
+  @keyframes artIn { to { opacity: 1; } }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50%      { opacity: 0.95; filter: brightness(1.4); }
+  }
+
+  .heart-final {
+    font-size: 18px;
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 0 18px rgba(255, 154, 60, 1),
+                 0 0 40px rgba(217, 79, 30, 0.9),
+                 0 0 70px rgba(217, 79, 30, 0.6);
+    white-space: pre;
+    text-align: center;
+    margin: 28px 0;
+    opacity: 0;
+    animation: heartIn 1.4s ease-out forwards, beat 1.6s ease-in-out infinite 1.4s;
+  }
+  @keyframes heartIn { to { opacity: 1; } }
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    30%      { transform: scale(1.12); }
+    60%      { transform: scale(0.99); }
+  }
+
+  /* =========================================================
+     🎂 CSS-ТОРТ
+     ========================================================= */
+  .cake-block {
+    text-align: center;
+    margin: 40px 0 10px;
+    opacity: 0;
+    animation: fadeIn 1.6s ease-out forwards;
+  }
+
+  .cake {
+    position: relative;
+    width: 220px;
+    height: 240px;
+    margin: 0 auto 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.4s ease;
+    filter: drop-shadow(0 0 20px rgba(255, 154, 60, 0.5));
+  }
+  .cake:hover { transform: scale(1.04); }
+  .cake:active { transform: scale(0.98); }
+
+  .flame {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 26px;
+    background: radial-gradient(ellipse at 50% 70%, #fff4c2 0%, #ffb347 45%, #ff6a00 75%, rgba(255, 100, 0, 0) 100%);
+    border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+    box-shadow: 0 0 22px 6px rgba(255, 170, 60, 0.9),
+                0 0 50px 12px rgba(255, 100, 0, 0.6);
+    animation: flicker 0.5s ease-in-out infinite alternate;
+    transform-origin: 50% 90%;
+    z-index: 4;
+  }
+  @keyframes flicker {
+    0%   { transform: translateX(-50%) scale(1) rotate(-2deg); opacity: 1; }
+    50%  { transform: translateX(-50%) scale(1.12) rotate(2deg); opacity: 0.95; }
+    100% { transform: translateX(-50%) scale(0.96) rotate(-1deg); opacity: 1; }
+  }
+  .flame::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 8px;
+    background: #7a2a00;
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+
+  .smoke {
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    background: rgba(220, 220, 220, 0.7);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .cake.blown .flame { display: none; }
+  .cake.blown .smoke {
+    animation: puff 1.6s ease-out forwards;
+  }
+  @keyframes puff {
+    0%   { opacity: 0.9; transform: translate(-50%, 0) scale(0.6); }
+    50%  { opacity: 0.5; transform: translate(-50%, -22px) scale(1.4); }
+    100% { opacity: 0; transform: translate(-50%, -50px) scale(2); }
+  }
+
+  .candle {
+    position: absolute;
+    left: 50%;
+    top: 30px;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 40px;
+    background: linear-gradient(90deg, #ff9a3c 0%, #fff4c2 50%, #ff9a3c 100%);
+    border-radius: 3px;
+    z-index: 3;
+    box-shadow: 0 0 8px rgba(255, 154, 60, 0.6);
+  }
+  .candle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -3px;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 5px;
+    background: #4a1a00;
+    border-radius: 50%;
+  }
+
+  .tier {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 8px;
+    box-shadow: inset 0 -8px 12px rgba(0,0,0,0.15),
+                inset 0 6px 8px rgba(255,255,255,0.25),
+                0 6px 14px rgba(0,0,0,0.35);
+  }
+  .tier-top {
+    top: 70px;
+    width: 120px;
+    height: 45px;
+    background: linear-gradient(180deg, #ffe0b8 0%, #ffb98a 60%, #d97742 100%);
+  }
+  .tier-mid {
+    top: 115px;
+    width: 170px;
+    height: 55px;
+    background: linear-gradient(180deg, #ffc99a 0%, #ff9a5c 60%, #c85a2c 100%);
+  }
+  .tier-bot {
+    top: 170px;
+    width: 220px;
+    height: 60px;
+    background: linear-gradient(180deg, #ffb88a 0%, #e8703a 60%, #a33a15 100%);
+  }
+  .cream {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -8px;
+    height: 14px;
+    background: radial-gradient(circle at 10px 8px, #fff4e0 8px, transparent 9px) repeat-x;
+    background-size: 20px 14px;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+  }
+  .cherry {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle at 30% 30%, #ff6b6b 0%, #c81e3a 70%, #7a0a1e 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 60, 60, 0.6);
+    z-index: 2;
+  }
+  .cherry::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    width: 2px;
+    height: 5px;
+    background: #4a2a00;
+    border-radius: 1px;
+  }
+
+  .wish-label {
+    margin-top: 18px;
+    color: #ffe6c2;
+    font-style: italic;
+    text-shadow: 0 0 10px rgba(255, 154, 60, 0.9);
+    opacity: 0;
+    animation: fadeIn 1.6s ease-out 0.3s forwards;
+  }
+
+  .wish-form {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    opacity: 0;
+    animation: fadeIn 1.6s ease-out 0.6s forwards;
+  }
+  .wish-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 154, 60, 0.7);
+    background: rgba(30, 8, 2, 0.55);
+    color: #fff4e0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    letter-spacing: 1px;
+    outline: none;
+    box-shadow: 0 0 18px rgba(255, 154, 60, 0.35) inset, 0 0 18px rgba(255, 154, 60, 0.25);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    resize: vertical;
+    min-height: 60px;
+  }
+  .wish-input:focus {
+    border-color: rgba(255, 200, 120, 1);
+    box-shadow: 0 0 22px rgba(255, 154, 60, 0.55) inset, 0 0 26px rgba(255, 154, 60, 0.45);
+  }
+
+  .wish-status {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #ffd6a3;
+    font-style: italic;
+    text-align: center;
+    min-height: 18px;
+  }
+
+  /* ===== КНОПКА "ЗА ЧТО Я ТЕБЯ ЛЮБЛЮ" ===== */
+  .love-wrap {
+    text-align: center;
+    margin: 40px 0 0;
+    opacity: 0;
+    animation: fadeIn 1.6s ease-out forwards;
+  }
+  .love-button {
+    display: inline-block;
+    padding: 14px 26px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #2a0a05;
+    background: linear-gradient(135deg, #ffe6a8, #ffb347);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 22px rgba(255, 154, 60, 0.8), 0 0 50px rgba(217, 79, 30, 0.5);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: lovePulse 3.2s ease-in-out infinite;
+  }
+  @keyframes lovePulse {
+    0%, 100% { box-shadow: 0 0 22px rgba(255, 154, 60, 0.8), 0 0 50px rgba(217, 79, 30, 0.5); transform: scale(1); }
+    50%      { box-shadow: 0 0 34px rgba(255, 154, 60, 1), 0 0 80px rgba(217, 79, 30, 0.8); transform: scale(1.03); }
+  }
+  .love-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 0 36px rgba(255, 154, 60, 1), 0 0 80px rgba(217, 79, 30, 0.8);
+  }
+  .love-hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #ffd6a3;
+    font-style: italic;
+    text-shadow: 0 0 8px rgba(255, 154, 60, 0.8);
+    opacity: 0.85;
+  }
+
+  /* ===== КРУГЛЫЕ КНОПКИ ===== */
+  .next-button, .back-button {
+    position: fixed;
+    bottom: 22px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 230, 180, 0.9);
+    background: linear-gradient(135deg, #ffe6a8, #ffb347);
+    color: #2a0a05;
+    font-family: 'Courier New', monospace;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 26px rgba(255, 154, 60, 0.9), 0 0 60px rgba(217, 79, 30, 0.6);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.6);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+    animation: nextFloat 3s ease-in-out infinite;
+  }
+  .next-button { right: 22px; }
+  .back-button { left: 22px; }
+  .next-button.show, .back-button.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+  @keyframes nextFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  .next-button:hover, .back-button:hover {
+    box-shadow: 0 0 40px rgba(255, 154, 60, 1), 0 0 90px rgba(217, 79, 30, 0.9);
+  }
+  .next-button:active, .back-button:active { transform: scale(0.94); }
+
+  /* ===== ПОДПИСИ ПОД КРУГЛЫМИ КНОПКАМИ ===== */
+  .round-hint {
+    position: fixed;
+    z-index: 91;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #ffe6c2;
+    font-style: italic;
+    text-shadow: 0 0 8px rgba(255, 154, 60, 0.9);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.3s;
+    white-space: nowrap;
+  }
+  .round-hint.show { opacity: 0.9; }
+  .round-hint.next { right: 22px; bottom: 96px; text-align: right; }
+  .round-hint.back { left: 22px; bottom: 96px; text-align: left; }
+
+  /* ===== ФИНАЛЬНЫЙ ЭКРАН ===== */
+  .final-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 10px;
+  }
+  .final-screen.show { display: block; }
+
+  .final-title {
+    font-size: 18px;
+    color: #fff4e0;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    text-shadow: 0 0 14px rgba(255, 154, 60, 1), 0 0 30px rgba(217, 79, 30, 0.8);
+    opacity: 0;
+    animation: fadeIn 1.4s ease-out forwards;
+  }
+  .final-title-line {
+    display: block;
+    font-size: 14px;
+    color: #ffd6a3;
+    margin-top: 8px;
+    letter-spacing: 1px;
+    font-style: italic;
+  }
+
+  .days-counter {
+    font-size: 72px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 24px rgba(255, 154, 60, 1),
+                 0 0 60px rgba(255, 100, 0, 0.9),
+                 0 0 120px rgba(217, 79, 30, 0.7);
+    letter-spacing: 2px;
+    line-height: 1;
+    margin: 20px 0 6px;
+    opacity: 0;
+    animation: counterIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards,
+               counterPulse 3s ease-in-out 2s infinite;
+    display: inline-block;
+  }
+  @keyframes counterIn {
+    0%   { opacity: 0; transform: scale(0.5); }
+    60%  { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes counterPulse {
+    0%, 100% { text-shadow: 0 0 24px rgba(255, 154, 60, 1), 0 0 60px rgba(255, 100, 0, 0.9), 0 0 120px rgba(217, 79, 30, 0.7); }
+    50%      { text-shadow: 0 0 34px rgba(255, 200, 120, 1), 0 0 90px rgba(255, 100, 0, 1), 0 0 160px rgba(217, 79, 30, 0.9); }
+  }
+
+  .digit-roll {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    vertical-align: bottom;
+    height: 1em;
+    line-height: 1;
+  }
+  .digit-roll .digit-track {
+    display: inline-block;
+    animation: digitUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes digitUp {
+    0%   { transform: translateY(60%); opacity: 0; }
+    100% { transform: translateY(0);   opacity: 1; }
+  }
+
+  .days-label {
+    font-size: 16px;
+    color: #ffe0b8;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeIn 1.4s ease-out 0.8s forwards;
+  }
+
+  .sub-counters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 30px;
+  }
+  .sub-counter {
+    flex: 1 1 140px;
+    max-width: 180px;
+    padding: 16px 10px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(255, 154, 60, 0.5);
+    background: rgba(40, 10, 4, 0.5);
+    box-shadow: 0 0 20px rgba(255, 154, 60, 0.3) inset, 0 0 18px rgba(255, 154, 60, 0.25);
+    opacity: 0;
+    animation: fadeIn 1.4s ease-out forwards;
+  }
+  .sub-counter:nth-child(1) { animation-delay: 1.1s; }
+  .sub-counter:nth-child(2) { animation-delay: 1.3s; }
+  .sub-counter:nth-child(3) { animation-delay: 1.5s; }
+  .sub-counter:nth-child(4) { animation-delay: 1.7s; }
+
+  .sub-value {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 14px rgba(255, 154, 60, 1), 0 0 30px rgba(217, 79, 30, 0.7);
+    margin-bottom: 6px;
+    word-break: break-word;
+  }
+  .sub-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #ffd6a3;
+    text-transform: uppercase;
+  }
+
+  .final-quote {
+    margin-top: 50px;
+    font-size: 15px;
+    font-style: italic;
+    color: #ffe6c2;
+    line-height: 1.8;
+    text-shadow: 0 0 12px rgba(255, 154, 60, 0.9);
+    opacity: 0;
+    animation: fadeIn 1.6s ease-out 1.8s forwards;
+  }
+
+  /* ===== ФОТО МАМЫ В РАМКЕ ===== */
+  .mom-photo-wrap {
+    margin-top: 50px;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1.8s ease-out 2.6s forwards;
+  }
+  .mom-photo-frame {
+    display: inline-block;
+    padding: 16px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #ffe6a8 0%, #ffb347 45%, #d97742 100%);
+    box-shadow:
+      0 0 30px rgba(255, 200, 120, 0.9),
+      0 0 80px rgba(217, 79, 30, 0.6),
+      inset 0 0 12px rgba(255, 255, 255, 0.5);
+    position: relative;
+    transition: transform 0.5s ease;
+    animation: momFrameGlow 4s ease-in-out infinite;
+  }
+  @keyframes momFrameGlow {
+    0%, 100% {
+      box-shadow: 0 0 30px rgba(255, 200, 120, 0.9), 0 0 80px rgba(217, 79, 30, 0.6), inset 0 0 12px rgba(255, 255, 255, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 46px rgba(255, 220, 150, 1), 0 0 120px rgba(217, 79, 30, 0.85), inset 0 0 16px rgba(255, 255, 255, 0.7);
+    }
+  }
+  .mom-photo-frame:hover { transform: scale(1.03); }
+
+  .mom-photo-frame img {
+    display: block;
+    width: 360px;
+    max-width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.4) inset;
+  }
+
+  .mom-photo-frame::before,
+  .mom-photo-frame::after {
+    content: '♥';
+    position: absolute;
+    color: #fff4e0;
+    font-size: 22px;
+    text-shadow: 0 0 12px rgba(255, 154, 60, 1);
+    opacity: 0.9;
+    animation: heartBeatSmall 2.4s ease-in-out infinite;
+  }
+  .mom-photo-frame::before { top: -12px; left: 8px; }
+  .mom-photo-frame::after  { bottom: -12px; right: 8px; animation-delay: 1.2s; }
+  @keyframes heartBeatSmall {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.25); }
+  }
+
+  .mom-photo-caption {
+    margin-top: 22px;
+    font-size: 17px;
+    font-style: italic;
+    color: #fff4e0;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 14px rgba(255, 154, 60, 1), 0 0 30px rgba(217, 79, 30, 0.8);
+    opacity: 0;
+    animation: fadeIn 1.6s ease-out 3.2s forwards;
+  }
+
+  /* ===== КНОПКИ ФИНАЛА ===== */
+  .final-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeIn 1.6s ease-out 3s forwards;
+  }
+  .thanks-wrap, .family-wrap, .restart-wrap {
+    text-align: center;
+  }
+  .thanks-button, .family-button, .restart-button {
+    display: inline-block;
+    padding: 13px 24px;
+    font-family: 'Courier New', monospace;
+    font-size: 13.5px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #2a0a05;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: lovePulse 3.6s ease-in-out infinite;
+  }
+  .thanks-button {
+    background: linear-gradient(135deg, #ffd6e8, #ff9a3c);
+    box-shadow: 0 0 22px rgba(255, 154, 60, 0.7), 0 0 50px rgba(217, 79, 30, 0.45);
+  }
+  .family-button {
+    background: linear-gradient(135deg, #ffe6a8, #ffb347);
+    box-shadow: 0 0 22px rgba(255, 200, 100, 0.7), 0 0 50px rgba(217, 79, 30, 0.45);
+  }
+  .restart-button {
+    background: linear-gradient(135deg, #ffd6e8, #ff6bb0);
+    box-shadow: 0 0 22px rgba(255, 120, 180, 0.7), 0 0 50px rgba(217, 79, 30, 0.45);
+  }
+  .thanks-button:hover, .family-button:hover, .restart-button:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 0 34px rgba(255, 154, 60, 1), 0 0 80px rgba(217, 79, 30, 0.8);
+  }
+  .thanks-hint, .family-hint, .restart-hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #ffd6a3;
+    font-style: italic;
+    text-shadow: 0 0 8px rgba(255, 154, 60, 0.8);
+    opacity: 0.85;
+  }
+
+  /* ===== МОДАЛКА ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 5, 2, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    max-width: 560px;
+    width: 100%;
+    background: linear-gradient(160deg, rgba(60, 18, 8, 0.95), rgba(30, 8, 2, 0.95));
+    border: 2px solid rgba(255, 154, 60, 0.7);
+    border-radius: 18px;
+    padding: 26px 22px;
+    color: #ffe0b8;
+    box-shadow: 0 0 50px rgba(255, 154, 60, 0.6), 0 0 120px rgba(217, 79, 30, 0.4);
+    text-shadow: 0 0 10px rgba(255, 154, 60, 0.6);
+    transform: scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    max-height: 85vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal h3 {
+    text-align: center;
+    margin-bottom: 18px;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #fff4e0;
+  }
+  .modal ul { list-style: none; padding: 0; }
+  .modal li {
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255, 154, 60, 0.35);
+    line-height: 1.5;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateX(-8px);
+    animation: slideIn 0.8s ease-out forwards;
+  }
+  .modal li:last-child { border-bottom: none; }
+  @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+  .modal li::before {
+    content: '♥ ';
+    color: #ff9a3c;
+    margin-right: 6px;
+  }
+  .modal-close {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 22px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #2a0a05;
+    background: linear-gradient(135deg, #ffe6a8, #ffb347);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(255, 154, 60, 0.7);
+    transition: transform 0.2s;
+  }
+  .modal-close:hover { transform: scale(1.04); }
+
+  /* ===== КОНФЕТТИ ===== */
+  .confetti-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* ===== ФОНОВЫЕ СЕРДЦА ===== */
+  .particle {
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: #ffffff;
+    pointer-events: none;
+    z-index: 2;
+    text-shadow: 0 0 12px rgba(255, 154, 60, 1), 0 0 25px rgba(217, 79, 30, 0.8);
+    animation: float linear forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes float {
+    from { transform: translateY(105vh) scale(0.8); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    to   { transform: translateY(-15vh) scale(1.2); opacity: 0; }
+  }
+
+  /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+  @media (max-width: 600px) {
+    body { padding: 14px 12px 100px; align-items: flex-start; }
+    #terminal { font-size: 13px; letter-spacing: 0.4px; line-height: 1.65; padding-bottom: 120px; }
+    .photo-wrap img { width: 100%; max-width: 300px; }
+    .big-art { font-size: 8px; line-height: 1.15; margin: 24px 0; }
+    .heart-final { font-size: 11px; }
+
+    .cake { width: 180px; height: 200px; }
+    .tier-top { top: 58px; width: 100px; height: 38px; }
+    .tier-mid { top: 96px; width: 140px; height: 46px; }
+    .tier-bot { top: 142px; width: 180px; height: 50px; }
+    .candle { top: 24px; height: 34px; width: 8px; }
+    .flame { width: 14px; height: 22px; top: 4px; }
+
+    .love-button { font-size: 12.5px; padding: 13px 20px; letter-spacing: 1px; }
+    .love-hint { font-size: 10px; }
+
+    .next-button, .back-button {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      bottom: 16px;
+    }
+    .next-button { right: 16px; }
+    .back-button { left: 16px; }
+    .round-hint { font-size: 9px; }
+    .round-hint.next { right: 16px; bottom: 84px; }
+    .round-hint.back { left: 16px; bottom: 84px; }
+
+    .days-counter { font-size: 52px; }
+    .days-label { font-size: 13px; letter-spacing: 2px; }
+    .sub-counter { flex: 1 1 100px; max-width: 130px; padding: 12px 8px; }
+    .sub-value { font-size: 18px; }
+    .sub-label { font-size: 10px; letter-spacing: 1px; }
+    .final-title { font-size: 15px; }
+    .final-quote { font-size: 13.5px; margin-top: 36px; }
+
+    .mom-photo-frame img { width: 260px; }
+    .mom-photo-caption { font-size: 15px; }
+
+    .final-buttons { gap: 12px; }
+    .thanks-button, .family-button, .restart-button { font-size: 12px; padding: 12px 18px; letter-spacing: 1px; }
+    .thanks-hint, .family-hint, .restart-hint { font-size: 10px; }
+
+    .modal { padding: 20px 16px; }
+    .modal li { font-size: 13px; }
+  }
+  @media (max-width: 400px) {
+    .photo-wrap img { max-width: 260px; }
+    .big-art { font-size: 6.5px; }
+    .heart-final { font-size: 9.5px; }
+    #terminal { font-size: 12px; }
+    .days-counter { font-size: 44px; }
+    .mom-photo-frame img { width: 220px; }
+    .mom-photo-caption { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+<div id="terminal"></div>
+
+<!-- круглая кнопка "дальше" + подпись -->
+<button class="next-button" id="nextButton" title="Дальше">→</button>
+<div class="round-hint next" id="nextHint">нажми для продолжения</div>
+
+<!-- круглая кнопка "назад" + подпись -->
+<button class="back-button" id="backButton" title="Назад">←</button>
+<div class="round-hint back" id="backHint">нажми, чтобы вернуться</div>
+
+<!-- ===== МОДАЛКА "ЗА ЧТО Я ТЕБЯ ЛЮБЛЮ" ===== -->
+<div class="modal-overlay" id="loveModal">
+  <div class="modal">
+    <h3>♥ ЗА ЧТО Я ТЕБЯ ЛЮБЛЮ ♥</h3>
+    <ul id="loveList">
+      <li>За то, что ты всегда рядом — даже когда я этого не заслуживаю.</li>
+      <li>За твой смех, который лечит любую мою печаль.</li>
+      <li>За объятия, в которых весь мир становится безопасным.</li>
+      <li>За твою силу — ты справляешься со всем, и ещё остаётся на меня.</li>
+      <li>За твой характер — иногда грозный, но всегда любящий.</li>
+      <li>За то, что ты умеешь слушать так, как не умеет никто.</li>
+      <li>За твои советы — даже те, которые я не сразу понимаю.</li>
+      <li>За то, что ты всегда веришь в меня, даже когда я сам не верю.</li>
+      <li>За твою заботу — в мелочах, которые я замечаю не сразу.</li>
+      <li>За то, что ты умеешь прощать меня, когда я веду себя как дурак.</li>
+      <li>За твои тёплые руки, которые помнят меня ещё с детства.</li>
+      <li>За то, что ты — моя мама. И лучше тебя нет.</li>
+    </ul>
+    <button class="modal-close" id="modalClose">закрыть</button>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА "СПАСИБО ЗА" ===== -->
+<div class="modal-overlay" id="thanksModal">
+  <div class="modal">
+    <h3>♥ СПАСИБО ТЕБЕ ЗА... ♥</h3>
+    <ul id="thanksList">
+      <li>За то, что подарила мне жизнь и не сошла с ума в процессе.</li>
+      <li>За бессонные ночи, когда я был маленьким — и за бессонные ночи, когда я стал подростком.</li>
+      <li>За то, что научила меня говорить, ходить и не сдаваться.</li>
+      <li>За твои объятия, которые лечат лучше любого лекарства.</li>
+      <li>За то, что ты всегда на моей стороне — даже когда я неправ.</li>
+      <li>За твой смех, который я узнаю из тысячи.</li>
+      <li>За то, что ты умеешь превратить обычный день в праздник.</li>
+      <li>За твои советы — даже те, к которым я прихожу сам через годы.</li>
+      <li>За то, что ты всегда ждёшь меня домой.</li>
+      <li>За то, что ты — моя мама. И я тебя очень люблю.</li>
+    </ul>
+    <button class="modal-close" id="thanksClose">закрыть</button>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА "ПОЗДРАВЛЕНИЯ ОТ СЕМЬИ" ===== -->
+<div class="modal-overlay" id="familyModal">
+  <div class="modal">
+    <h3>♥ ПОЗДРАВЛЕНИЯ ОТ СЕМЬИ ♥</h3>
+    <ul id="familyList">
+      <li>Конечно, папа, брат и бабушка уже поздравили тебя лично — и ещё раз поздравят.</li>
+      <li>Но я тут собрал то, что они говорят про тебя, когда тебя нет рядом.</li>
+      <li>«Она у нас самая сильная» — говорит папа.</li>
+      <li>«Она всегда всё разрулит» — говорит брат.</li>
+      <li>«С ней никогда не скучно, и пироги у неё лучшие» — говорит бабушка.</li>
+      <li>А я добавлю от себя: ты — центр нашей семьи. И без тебя бы ничего не было.</li>
+      <li>С днём рождения, мама! Мы все тебя очень любим 💗</li>
+    </ul>
+    <button class="modal-close" id="familyClose">закрыть</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   ⚙️ НАСТРОЙКА ОТПРАВКИ ЖЕЛАНИЙ
+   ========================================================= */
+const CONFIG = {
+  TELEGRAM_BOT_TOKEN: '8947602449:AAGU-VDR5CjQBjJIyXjmwNcmhFw4FeWMuHo',
+  TELEGRAM_CHAT_ID:   '1948566061',
+  FORMSPREE_ENDPOINT: '',
+  EMAIL_FALLBACK: ''
+};
+
+/* =========================================================
+   👶 ДАТА РОЖДЕНИЯ (когда она стала мамой)
+   0 = январь, 4 = май
+   ========================================================= */
+const BIRTH_DATE = new Date(2008, 5, 14, 12, 0, 0);
+
+/* ========================================================= */
+
+const terminal = document.getElementById('terminal');
+const confettiCanvas = document.getElementById('confettiCanvas');
+const nextButton = document.getElementById('nextButton');
+const backButton = document.getElementById('backButton');
+const nextHint = document.getElementById('nextHint');
+const backHint = document.getElementById('backHint');
+const thanksModal = document.getElementById('thanksModal');
+const familyModal = document.getElementById('familyModal');
+
+/* ---------- ASCII ---------- */
+const wordMAMA = `
+ ███╗   ███╗  █████╗  ███╗   ███╗  █████╗
+ ████╗ ████║ ██╔══██╗ ████╗ ████║ ██╔══██╗
+ ██╔████╔██║ ███████║ ██╔████╔██║ ███████║
+ ██║╚██╔╝██║ ██╔══██║ ██║╚██╔╝██║ ██╔══██║
+ ██║ ╚═╝ ██║ ██║  ██║ ██║ ╚═╝ ██║ ██║  ██║
+ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝
+`;
+
+const wordLove = `
+ ██╗     ██████╗ ██╗   ██╗███████╗
+ ██║    ██╔═══██╗██║   ██║██╔════╝
+ ██║    ██║   ██║██║   ██║█████╗
+ ██║    ██║   ██║╚██╗ ██╔╝██╔══╝
+ ███████╗╚██████╔╝ ╚████╔╝ ███████╗
+ ╚══════╝ ╚═════╝   ╚═══╝  ╚══════╝
+`;
+
+const heartFinal = `
+ ♥♥♥♥♥♥♥   ♥♥♥♥♥♥♥
+♥♥♥♥♥♥♥♥♥ ♥♥♥♥♥♥♥♥♥
+♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥
+♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥
+ ♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥
+  ♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥
+   ♥♥♥♥♥♥♥♥♥♥♥♥♥
+    ♥♥♥♥♥♥♥♥♥♥♥
+     ♥♥♥♥♥♥♥♥♥
+      ♥♥♥♥♥♥♥
+       ♥♥♥♥♥
+        ♥♥♥
+         ♥
+`;
+
+/* ---------- Стих ---------- */
+const poem = [
+  ["С днём рождения, мама!", "Ты — как спецназ в юбке:", "Красивая, опасная,", "Решаешь всё без шуток."],
+  ["На работе пусть «некоторые»", "Не тревожат твои нервы.", "Ты им просто покажи", "Свой ежедневник — там"],
+  ["Написано: «Убить. Всех. К вечеру».", "", "Шутка! Ты у нас добрая,", "Хоть и с острым языком."],
+  ["Ты их мысленно — в мешок,", "А мешок — потом в обком.", "", "Пусть же будет всё иначе:"],
+  ["Меньше слёз и больше дачи,", "Больше смеха, меньше драм,", "И зарплата — пополам", "С отпуском. А те, кто бесил, —"],
+  ["Пусть уйдут. Без нас. Совсем.", "", "Ты — моя звезда и свет,", "Лучше мамы в мире нет."],
+  ["Обнимаю, поздравляю,", "Много счастья пожелаю!"]
+];
+
+/* ---------- Сценарий ---------- */
+const script = [
+  { type: 'type', text: '> инициализация...', speed: 55 },
+  { type: 'type', text: '> поиск получателя....... найдено', speed: 45 },
+  { type: 'type', text: '> Получатель: Самая лучшая мама на свете', speed: 50 },
+  { type: 'type', text: '> сканирование сердечка... 100%', speed: 40 },
+  { type: 'wait', ms: 700 },
+  { type: 'photo', src: 'photo1.jpg' },
+  { type: 'wait', ms: 800 },
+  { type: 'type', text: '', speed: 0 },
+  { type: 'type', text: '> привет, мамуля 💗', speed: 65 },
+  { type: 'wait', ms: 600 },
+  { type: 'type', text: '> сегодня твой день. и у меня есть для тебя слова.', speed: 50 },
+  { type: 'wait', ms: 700 },
+  { type: 'poem', stanza: 0 },
+  { type: 'photo', src: 'photo2.jpg' },
+  { type: 'wait', ms: 700 },
+  { type: 'poem', stanza: 1 },
+  { type: 'photo', src: 'photo3.jpg' },
+  { type: 'wait', ms: 700 },
+  { type: 'poem', stanza: 2 },
+  { type: 'photo', src: 'photo4.jpg' },
+  { type: 'wait', ms: 700 },
+  { type: 'poem', stanza: 3 },
+  { type: 'photo', src: 'photo5.jpg' },
+  { type: 'wait', ms: 700 },
+  { type: 'poem', stanza: 4 },
+  { type: 'photo', src: 'photo6.jpg' },
+  { type: 'wait', ms: 700 },
+  { type: 'poem', stanza: 5 },
+  { type: 'photo', src: 'photo7.jpg' },
+  { type: 'wait', ms: 700 },
+  { type: 'poem', stanza: 6 },
+  { type: 'wait', ms: 900 },
+  { type: 'type', text: '', speed: 0 },
+  { type: 'type', text: '— от того, кто любит тебя больше всех 💗', speed: 55 },
+  { type: 'type', text: 'Извини что не первый поздравил тебя, делал уроки и открытку для тебя)', speed: 40 },
+  { type: 'wait', ms: 500 },
+  { type: 'cake' }
+];
+
+/* ---------- Утилиты ---------- */
+async function typeText(text, speed, el) {
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text[i];
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    await sleep(speed + Math.random() * 30);
+  }
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ---------- Прогон ---------- */
+async function run() {
+  for (const step of script) {
+    if (step.type === 'type') {
+      const el = document.createElement('div');
+      el.className = 'line cursor';
+      terminal.appendChild(el);
+      await typeText(step.text, step.speed, el);
+      el.classList.remove('cursor');
+      await sleep(200);
+    } else if (step.type === 'wait') {
+      await sleep(step.ms);
+    } else if (step.type === 'photo') {
+      const wrap = document.createElement('div');
+      wrap.className = 'photo-wrap';
+      const img = document.createElement('img');
+      img.src = step.src;
+      img.alt = '💗';
+      img.onerror = () => { img.style.opacity = '0.3'; img.alt = '📷 ' + step.src; };
+      wrap.appendChild(img);
+      terminal.appendChild(wrap);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      await sleep(700);
+    } else if (step.type === 'poem') {
+      const stanza = document.createElement('div');
+      stanza.className = 'poem-stanza';
+      for (const line of poem[step.stanza]) {
+        const el = document.createElement('div');
+        el.className = 'poem-line cursor';
+        el.textContent = '';
+        stanza.appendChild(el);
+        terminal.appendChild(stanza);
+        await typeText(line, 45, el);
+        el.classList.remove('cursor');
+        await sleep(160);
+      }
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      await sleep(450);
+    } else if (step.type === 'cake') {
+      renderCake();
+    }
+  }
+}
+
+/* =========================================================
+   🎂 ТОРТ
+   ========================================================= */
+function renderCake() {
+  const block = document.createElement('div');
+  block.className = 'cake-block';
+
+  const cake = document.createElement('div');
+  cake.className = 'cake';
+  cake.id = 'cake';
+  cake.title = 'Нажми на свечку';
+  cake.innerHTML = `
+    <div class="smoke"></div>
+    <div class="flame"></div>
+    <div class="candle"></div>
+    <div class="tier tier-top"><div class="cream"></div>
+      <div class="cherry" style="top:-6px; left:14px;"></div>
+      <div class="cherry" style="top:-6px; left:50%; margin-left:-5px;"></div>
+      <div class="cherry" style="top:-6px; right:14px;"></div>
+    </div>
+    <div class="tier tier-mid"><div class="cream"></div>
+      <div class="cherry" style="top:-6px; left:22px;"></div>
+      <div class="cherry" style="top:-6px; left:50%; margin-left:-5px;"></div>
+      <div class="cherry" style="top:-6px; right:22px;"></div>
+    </div>
+    <div class="tier tier-bot"><div class="cream"></div>
+      <div class="cherry" style="top:-6px; left:30px;"></div>
+      <div class="cherry" style="top:-6px; left:50%; margin-left:-5px;"></div>
+      <div class="cherry" style="top:-6px; right:30px;"></div>
+    </div>
+  `;
+  cake.addEventListener('click', onBlowCandle);
+  block.appendChild(cake);
+
+  const label = document.createElement('div');
+  label.className = 'wish-label';
+  label.textContent = 'Загадай желание, напиши его ниже и нажми на свечку 🕯️';
+  block.appendChild(label);
+
+  const form = document.createElement('div');
+  form.className = 'wish-form';
+  const input = document.createElement('textarea');
+  input.className = 'wish-input';
+  input.id = 'wishInput';
+  input.placeholder = 'Твоё желание...';
+  input.rows = 3;
+  form.appendChild(input);
+  block.appendChild(form);
+
+  const status = document.createElement('div');
+  status.className = 'wish-status';
+  status.id = 'wishStatus';
+  block.appendChild(status);
+
+  terminal.appendChild(block);
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+async function onBlowCandle() {
+  const cake = document.getElementById('cake');
+  if (!cake || cake.classList.contains('blown')) return;
+
+  const input = document.getElementById('wishInput');
+  const status = document.getElementById('wishStatus');
+  const wish = (input?.value || '').trim();
+
+  cake.classList.add('blown');
+
+  if (wish) {
+    status.textContent = 'отправляю желание... ✨';
+    const ok = await sendWish(wish);
+    status.textContent = ok
+      ? 'желание улетело! ✨'
+      : 'не получилось отправить, но я его всё равно чувствую 💗';
+  } else {
+    status.textContent = 'желание без слов — тоже желание 💗';
+  }
+
+  launchConfetti();
+
+  await sleep(1400);
+  renderFinalBlock();
+}
+
+/* =========================================================
+   📮 ОТПРАВКА
+   ========================================================= */
+async function sendWish(text) {
+  if (CONFIG.TELEGRAM_BOT_TOKEN && CONFIG.TELEGRAM_CHAT_ID) {
+    try {
+      const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CONFIG.TELEGRAM_CHAT_ID,
+          text: `🎂 Желание от мамы:\n\n${text}`
+        })
+      });
+      return res.ok;
+    } catch (e) { console.warn(e); return false; }
+  }
+
+  if (CONFIG.FORMSPREE_ENDPOINT) {
+    try {
+      const res = await fetch(CONFIG.FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wish: text, from: 'мама', date: new Date().toLocaleString('ru-RU') })
+      });
+      return res.ok;
+    } catch (e) { console.warn(e); return false; }
+  }
+
+  if (CONFIG.EMAIL_FALLBACK) {
+    const subject = encodeURIComponent('Желание от мамы 🎂');
+    const body = encodeURIComponent(text);
+    window.location.href = `mailto:${CONFIG.EMAIL_FALLBACK}?subject=${subject}&body=${body}`;
+    return true;
+  }
+
+  console.log('🎂 Желание мамы:', text);
+  return true;
+}
+
+/* =========================================================
+   🎉 КОНФЕТТИ
+   ========================================================= */
+function launchConfetti() {
+  const canvas = confettiCanvas;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+
+  const colors = ['#ffd27a', '#ff9a3c', '#d94f1e', '#ff6bb0', '#fff4e0', '#ffb347'];
+  const pieces = [];
+  const count = 180;
+
+  for (let i = 0; i < count; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * canvas.height * 0.5,
+      w: 6 + Math.random() * 8,
+      h: 8 + Math.random() * 12,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vy: 2 + Math.random() * 3.5,
+      vx: -1.5 + Math.random() * 3,
+      rot: Math.random() * Math.PI * 2,
+      vrot: -0.15 + Math.random() * 0.3,
+      sway: Math.random() * Math.PI * 2
+    });
+  }
+
+  let frames = 0;
+  const maxFrames = 260;
+
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of pieces) {
+      p.sway += 0.05;
+      p.x += p.vx + Math.sin(p.sway) * 0.6;
+      p.y += p.vy;
+      p.rot += p.vrot;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+    frames++;
+    if (frames < maxFrames) requestAnimationFrame(tick);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  tick();
+}
+
+/* =========================================================
+   🎁 ФИНАЛЬНЫЙ БЛОК
+   ========================================================= */
+function renderFinalBlock() {
+  const art1 = document.createElement('pre');
+  art1.className = 'big-art';
+  art1.textContent = wordMAMA;
+  terminal.appendChild(art1);
+
+  const heart = document.createElement('pre');
+  heart.className = 'heart-final';
+  heart.textContent = heartFinal;
+  terminal.appendChild(heart);
+
+  const art2 = document.createElement('pre');
+  art2.className = 'big-art';
+  art2.textContent = wordLove;
+  terminal.appendChild(art2);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'love-wrap';
+
+  const btn = document.createElement('button');
+  btn.className = 'love-button';
+  btn.textContent = '♥ за что я тебя люблю ♥';
+  btn.addEventListener('click', openLoveModal);
+  wrap.appendChild(btn);
+
+  const hint = document.createElement('span');
+  hint.className = 'love-hint';
+  hint.textContent = 'нажми на кнопку';
+  wrap.appendChild(hint);
+
+  terminal.appendChild(wrap);
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+  nextButton.classList.add('show');
+  nextHint.classList.add('show');
+}
+
+/* ---------- Модалки ---------- */
+function openLoveModal() {
+  document.getElementById('loveModal').classList.add('open');
+  document.querySelectorAll('#loveList li').forEach((li, i) => {
+    li.style.animation = 'none';
+    void li.offsetWidth;
+    li.style.animation = `slideIn 0.8s ease-out ${i * 0.09 + 0.1}s forwards`;
+  });
+}
+function openThanksModal() {
+  thanksModal.classList.add('open');
+  document.querySelectorAll('#thanksList li').forEach((li, i) => {
+    li.style.animation = 'none';
+    void li.offsetWidth;
+    li.style.animation = `slideIn 0.8s ease-out ${i * 0.09 + 0.1}s forwards`;
+  });
+}
+function openFamilyModal() {
+  familyModal.classList.add('open');
+  document.querySelectorAll('#familyList li').forEach((li, i) => {
+    li.style.animation = 'none';
+    void li.offsetWidth;
+    li.style.animation = `slideIn 0.8s ease-out ${i * 0.09 + 0.1}s forwards`;
+  });
+}
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('loveModal').classList.remove('open');
+});
+document.getElementById('loveModal').addEventListener('click', (e) => {
+  if (e.target.id === 'loveModal') e.target.classList.remove('open');
+});
+document.getElementById('thanksClose').addEventListener('click', () => {
+  thanksModal.classList.remove('open');
+});
+thanksModal.addEventListener('click', (e) => {
+  if (e.target.id === 'thanksModal') e.target.classList.remove('open');
+});
+document.getElementById('familyClose').addEventListener('click', () => {
+  familyModal.classList.remove('open');
+});
+familyModal.addEventListener('click', (e) => {
+  if (e.target.id === 'familyModal') e.target.classList.remove('open');
+});
+
+/* =========================================================
+   ⏩ КНОПКА "ДАЛЬШЕ"
+   ========================================================= */
+let savedFinalBlock = null;
+
+nextButton.addEventListener('click', async () => {
+  nextButton.classList.remove('show');
+  nextHint.classList.remove('show');
+
+  savedFinalBlock = terminal.innerHTML;
+
+  terminal.style.opacity = '0';
+  await sleep(850);
+  terminal.innerHTML = '';
+  terminal.style.opacity = '1';
+
+  renderFinalScreen();
+  backButton.classList.add('show');
+  backHint.classList.add('show');
+});
+
+/* =========================================================
+   ⏪ КНОПКА "НАЗАД"
+   ========================================================= */
+backButton.addEventListener('click', async () => {
+  backButton.classList.remove('show');
+  backHint.classList.remove('show');
+
+  terminal.style.opacity = '0';
+  await sleep(850);
+
+  document.body.classList.remove('final-mode');
+
+  if (savedFinalBlock !== null) terminal.innerHTML = savedFinalBlock;
+  terminal.style.opacity = '1';
+
+  const btn = terminal.querySelector('.love-button');
+  if (btn) btn.addEventListener('click', openLoveModal);
+
+  nextButton.classList.add('show');
+  nextHint.classList.add('show');
+
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+});
+
+/* =========================================================
+   ⏳ ФИНАЛЬНЫЙ ЭКРАН
+   ========================================================= */
+function animateNumber(el, value) {
+  const str = value.toLocaleString('ru-RU');
+  el.innerHTML = '';
+  let i = 0;
+  for (const ch of str) {
+    if (ch === ' ' || ch === '\u00A0') {
+      const sep = document.createElement('span');
+      sep.className = 'sep';
+      sep.textContent = ' ';
+      el.appendChild(sep);
+    } else {
+      const roll = document.createElement('span');
+      roll.className = 'digit-roll';
+      const track = document.createElement('span');
+      track.className = 'digit-track';
+      track.textContent = ch;
+      track.style.animationDelay = (i * 0.06) + 's';
+      roll.appendChild(track);
+      el.appendChild(roll);
+      i++;
+    }
+  }
+}
+
+function renderFinalScreen() {
+  document.body.classList.add('final-mode');
+
+  const screen = document.createElement('div');
+  screen.className = 'final-screen show';
+
+  const now = new Date();
+  const diffMs = now - BIRTH_DATE;
+  const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const years = Math.floor(totalDays / 365.25);
+  const months = Math.floor((totalDays - years * 365.25) / 30.44);
+
+  screen.innerHTML = `
+    <div class="final-title">
+      сколько ты уже моя мама
+      <span class="final-title-line">с самого первого дня и до этого момента</span>
+    </div>
+
+    <div class="days-counter" id="daysCounter"></div>
+    <div class="days-label">дней</div>
+
+    <div class="sub-counters">
+      <div class="sub-counter">
+        <div class="sub-value">${years} лет ${months} мес</div>
+        <div class="sub-label">точный возраст</div>
+      </div>
+      <div class="sub-counter">
+        <div class="sub-value" id="hoursCounter"></div>
+        <div class="sub-label">часов рядом</div>
+      </div>
+      <div class="sub-counter">
+        <div class="sub-value" id="minutesCounter"></div>
+        <div class="sub-label">минут любви</div>
+      </div>
+      <div class="sub-counter">
+        <div class="sub-value" id="secondsCounter"></div>
+        <div class="sub-label">секунд, и всё ещё считаю</div>
+      </div>
+    </div>
+
+    <div class="final-quote">
+      «и каждая из этих минут —<br>
+      была бы неполной без тебя.<br>
+      спасибо, что ты моя мама 💗»
+    </div>
+
+    <div class="mom-photo-wrap">
+      <div class="mom-photo-frame">
+        <img src="photo8.jpg" alt="Мама">
+      </div>
+      <div class="mom-photo-caption">А я ведь еще помню)</div>
+    </div>
+
+    <div class="final-buttons">
+      <div class="thanks-wrap">
+        <button class="thanks-button" id="thanksButton">♥ спасибо за ♥</button>
+        <span class="thanks-hint">нажми на кнопку</span>
+      </div>
+      <div class="family-wrap">
+        <button class="family-button" id="familyButton">♥ поздравления от семьи ♥</button>
+        <span class="family-hint">нажми на кнопку</span>
+      </div>
+      <div class="restart-wrap">
+        <button class="restart-button" id="restartButton">♥ прочитать заново ♥</button>
+        <span class="restart-hint">нажми на кнопку</span>
+      </div>
+    </div>
+  `;
+
+  terminal.appendChild(screen);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  setTimeout(() => {
+    animateNumber(document.getElementById('daysCounter'), totalDays);
+    animateNumber(document.getElementById('hoursCounter'), totalHours);
+    animateNumber(document.getElementById('minutesCounter'), totalMinutes);
+    animateNumber(document.getElementById('secondsCounter'), totalSeconds);
+  }, 200);
+
+  document.getElementById('thanksButton').addEventListener('click', openThanksModal);
+  document.getElementById('familyButton').addEventListener('click', openFamilyModal);
+  document.getElementById('restartButton').addEventListener('click', restartAll);
+
+  setInterval(() => {
+    const now = new Date();
+    const ms = now - BIRTH_DATE;
+    const d = document.getElementById('daysCounter');
+    const h = document.getElementById('hoursCounter');
+    const m = document.getElementById('minutesCounter');
+    const s = document.getElementById('secondsCounter');
+    if (d) d.textContent = Math.floor(ms / (1000 * 60 * 60 * 24)).toLocaleString('ru-RU');
+    if (h) h.textContent = Math.floor(ms / (1000 * 60 * 60)).toLocaleString('ru-RU');
+    if (m) m.textContent = Math.floor(ms / (1000 * 60)).toLocaleString('ru-RU');
+    if (s) s.textContent = Math.floor(ms / 1000).toLocaleString('ru-RU');
+  }, 1000);
+}
+
+/* =========================================================
+   🔄 ПЕРЕЗАПУСК ОТКРЫТКИ С НАЧАЛА
+   ========================================================= */
+async function restartAll() {
+  // гасим
+  terminal.style.opacity = '0';
+  await sleep(850);
+
+  // убираем рассветный фон
+  document.body.classList.remove('final-mode');
+
+  // чистим всё
+  terminal.innerHTML = '';
+  savedFinalBlock = null;
+
+  // скрываем круглые кнопки
+  nextButton.classList.remove('show');
+  backButton.classList.remove('show');
+  nextHint.classList.remove('show');
+  backHint.classList.remove('show');
+
+  terminal.style.opacity = '1';
+
+  // скроллим наверх
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // запускаем сценарий заново
+  await sleep(300);
+  run();
+}
+
+/* =========================================================
+   🎈 ФОНОВЫЕ СЕРДЦА
+   ========================================================= */
+const particleChars = ['♥', '❤', '♡', '✿'];
+function spawnParticle() {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.textContent = particleChars[Math.floor(Math.random() * particleChars.length)];
+  p.style.left = Math.random() * 100 + 'vw';
+  const duration = 6 + Math.random() * 5;
+  p.style.animationDuration = duration + 's';
+  const size = 16 + Math.random() * 26;
+  p.style.fontSize = size + 'px';
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), duration * 1000 + 500);
+  setTimeout(spawnParticle, 220 + Math.random() * 220);
+}
+spawnParticle();
+
+window.addEventListener('resize', () => {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+});
+
+run();
+</script>
+
+</body>
+</html>
